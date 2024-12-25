@@ -1,3 +1,4 @@
+//顺序表的动态分配
 #pragma once
 
 #include <stdlib.h>
@@ -20,8 +21,15 @@ void IncreaseSize(SeqList &L, int len){
     int *p = L.data;
     L.data = (int*)malloc(sizeof(int) * (L.MaxSize + len));
     for(int i = 0; i < L.length; i++){
-
+        L.data[i] = p[i];
     }
+    L.MaxSize += len;
+    free(p);
 }
+
+
+
+
+
 
 

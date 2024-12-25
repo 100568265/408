@@ -2,8 +2,7 @@
 #include "sqlist.h"
 
 int main() {
-    SqList L;
-    InitList(L);
-
-    return 0;
+    SqListTest();
 }
+
+
