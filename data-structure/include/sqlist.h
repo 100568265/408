@@ -53,6 +53,8 @@ int LocateElem(SqList L, int value){
 
 
 
+
+
 //顺序表测试
 void SqListTest() {
     SqList L;

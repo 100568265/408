@@ -41,23 +41,23 @@ bool InsertNextNode(LNode *p, int e){
     return true;
 }
 
+//按位查找，返回第i个元素(带头结点)
+LNode* GetElem(LinkList L, int pos) {
+	if(pos < 0) return nullptr;
+        LNode *p = L;
+        int j = 0;
+        while(p->next != nullptr && j < pos){
+          p = p->next;
+          j++;
+        }
+        return p;
+}
 
 //按位序插入
 bool ListInsert(LinkList &L, int pos, int element){
     if(pos < 1) return false;
-    LNode *p = L;    //指针p指向当前扫描到的结点
-    int j = 0;
-    while(p != nullptr && j < pos){
-      p = p->next;    //找到第pos个结点的指针
-      j++;
-    }
+    LNode *p = GetElem(L,pos - 1);
     InsertNextNode(p,element);
-    //    if(p == nullptr) return false;
-    //    LNode *p2 = (LNode*)malloc(sizeof(LNode));
-    //    p2->data = element;
-    //    p2->next = p->next;
-    //    p->next = p2;
-    //    return true;
 }
 
 //前插操作 在p结点之前插入e元素
@@ -77,12 +77,9 @@ bool InsertPriorNode(LNode *p, int e){
 //按位序删除，带头结点
 bool ListDelete(LinkList &L, int pos,int &element){
     if(pos < 1) return false;
-    LNode *p = L;
-    int j = 0;
-    while(p->next != nullptr && j < pos - 1){
-      p = p->next;
-      j++;
-    }
+
+    LNode *p = GetElem(L,pos - 1);
+
     if(p == nullptr) return false;
     if(p->next == nullptr) return false;
     LNode *q = p->next;    //令q指向被删除的结点
@@ -104,7 +101,24 @@ bool DeleteNode(LNode *p){
     return true;
 }
 
+//按值查找(找到数据域==e的结点)
+LNode* LocateElem(LinkList L, int element){
+	LNode *p = L->next;
+    while(p != nullptr && p->data != element)
+    	p = p->next;
+    return p;
+}
 
+//求表的长度
+int Length(LinkList L){
+	int len = 0;
+	LNode *p = L->next;
+    while(p->next != nullptr){
+    	p = p->next;
+        len++;
+    }
+    return len;
+}
 
 
 
