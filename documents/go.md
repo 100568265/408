@@ -379,7 +379,7 @@ var y = make([]int,3,6)	//开辟切片，长度为3，容量为6
 
 ### **append(追加)**
 
-原有切片后追加值
+**原有切片后追加值**
 
 ```go
 var emps = make([]string,3,5)	//开辟切片，长度为3，容量为5
@@ -392,9 +392,241 @@ emp2 := append(emp1,"赵六")
 
 
 
+**首位置添加一个值**
+
+```go
+var s = []int{1, 2, 3, 4, 5}
+ret := append([]int{100}, s...)	//用 ... 	把 切片s 打散
+fmt.Println(ret)
+```
 
 
-### 插入
+
+
+
+### append(插入)
+
+任意位置添加一个值或切片
+
+```go
+//在2和3之间插入1000
+var s = []int{1, 2, 3, 4, 5}
+temp := append([]int{1000}, s[2:]...)
+s2 := append(s[:2], temp...)
+fmt.Println(s2)
+```
+
+
+
+
+
+### append(删除)
+
+```go
+//删除索引为2的数据
+var s = []int{100,200,300,400,500}
+ret := append(s[:2],s[3:]...)
+fmt.Println(ret)
+```
+
+
+
+
+
+
+
+## 【4】map
+
+
+
+**map的声明和初始化**
+
+`var map名称 map[键类型]类型`
+
+```go
+//声明再初始化
+var stu map[string]string
+stu["name"] = "yuan"
+stu["age"] = "18"
+
+//声明并初始化
+var stu2 = map[string]string{"name":"yuan","age":"18"}
+```
+
+**map的基本操作**
+
+```go
+//查看键值
+stu["name"]
+for key,val := range stu{
+    fmt.Println(key,val) //打印键值对
+}
+
+//删除键值
+delete(stu,"age")
+
+//添加&更新键值对
+stu["weight"] = "70kg"
+```
+
+
+
+
+
+**map的进阶使用**
+
+如果把每个map看成一个对象，如果要把多个对象管理保存起来，可以使用容器将每个map对象存起来。
+
+```go
+//切片嵌套map
+var stu01 = map[string]string{"name":"张三","age":"23","gender":"male"}
+var stu02 = map[string]string{"name":"李四","age":"30","gender":"female"}
+var stu03 = map[string]string{"name":"王五","age":"28","gender":"male"}
+
+var students []map[string]string{stu01,stu02,stu03}		//切片嵌套map
+
+//找到第二个学生的名字
+students[1]["name"]
+```
+
+```go
+//map嵌套map
+var stu01 = map[string]string{"name":"张三","age":"23","gender":"male"}
+var stu02 = map[string]string{"name":"李四","age":"30","gender":"female"}
+var stu03 = map[string]string{"name":"王五","age":"28","gender":"male"}
+
+var students = map[int]map[string]string{1001:stu01,1002:stu02,1003:stu03}
+
+//查询学号为1002的学生的姓名
+fmt.Println(students[1002]["name"])
+```
+
+```go
+//map嵌套切片
+var stu01 = map[string]interface{}{"name":"张三","age":23,"gender":"male","hobby":[]string{"抽烟","喝酒","烫头"}}
+var students = []map[string]interface{}{stu01}	//这是一个切片，数据类型是map[string]interface{}
+```
+
+
+
+
+
+# 函数
+
+`func add(参数名 参数类型) 返回值类型{`
+    `//函数逻辑`
+    `return 返回值`
+`}`
+
+```go
+func add(x,y int) int{
+    return x+y
+}
+```
+
+
+
+
+
+## 作用域&全局变量
+
+**全局变量：**函数外面的就是全局变量
+
+```go
+var x = 100
+
+func main(){
+    //...
+}
+```
+
+
+
+
+
+## 可变长参数
+
+```go
+func add(nums ...int){
+    ret := 0
+    for_,num := range nums{
+        ret += num
+    }
+    fmt.Println(ret)
+}
+```
+
+
+
+
+
+## 多返回值
+
+返回多个值的时候需要把**返回值类型**用括号括起来
+
+```go
+//函数声明
+func query()(string,int){
+    return "zjs",28
+}
+
+//函数调用
+name,age := query()
+```
+
+
+
+
+
+## 返回值命名
+
+函数定义时可以给返回值命名，并在函数体中直接使用这些变量，最后通过`return`关键字返回。
+
+```go
+func calc(x,y int)(sum,sub int){
+    sum = x + y
+    sub = x - y
+    return			//相当于return sum, sub
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
