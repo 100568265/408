@@ -66,7 +66,9 @@ go run hello.go
 
 
 
-## 变量
+## 变量&常量
+
+**变量**
 
 ```go
 // 一般写法
@@ -82,6 +84,32 @@ var x,y,z = 10,20,30
 //匿名变量(接收函数返回值的时候用)
 var x, _ = foo()
 ```
+
+
+
+**常量**
+
+一般用法
+
+```go
+const a int = 10
+```
+
+枚举
+
+```go
+//const来定义枚举类型
+const (
+    //可以在const()添加一个关键字 iota，每行的iota都会累加1，第一行的iota默认是0
+    BEIJING = iota	//0
+    SHANGHAI		//1
+    SHENZHEN		//2
+)
+```
+
+
+
+
 
 
 
@@ -596,6 +624,178 @@ func calc(x,y int)(sum,sub int){
 
 
 
+# 文件操作
+
+磁盘只能存储`二进制`。
+
+因此，写文件的时候需要编码，读文件的时候需要解码。
+
+go语言默认编码是`UTF-8`
+
+
+
+go语言中，`byte`数据类型就是`uint8`
+
+```go
+var s byte
+s = 'a'
+fmt.Println(s)				//97
+fmt.Println(string(s))		//a
+```
+
+
+
+
+
+## 读文件
+
+**获取文件句柄**
+
+```go
+import "os"
+
+func main(){
+    file,err := os.Open("文件名.txt")
+    if err != nil{
+        fmt.Println("err:",err)
+    }
+    fmt.Println(file)
+}
+```
+
+
+
+**按照字节读**
+
+```go
+func readBytes(file *os.File) {
+	data := make([]byte, 1024)
+	file.Read(data)
+	fmt.Println(data)
+}
+```
+
+
+
+**按照行读字符串**
+
+```go
+func readByLine(file *os.File) {
+	reader := bufio.NewReader(file)
+	for true {
+		line, err := reader.ReadString('\n')	//读取字符串，以换行符为终点
+		if err == io.EOF {
+			break
+		}
+		fmt.Print(line)
+	}
+}
+```
+
+
+
+
+
+**读取整个文件**
+
+```go
+//打开文件+读文件
+func readFile(){
+    data,_ := os.ReadFile("text.txt")
+    fmt.Println(string(data))
+}
+```
+
+
+
+
+
+## 写文件
+
+
+
+**打开文件**
+
+```go
+func main(){
+    file,err := os.OpenFile("text.txt", os.O_WRONLY|os.O_CREATE|os.O_APPEND,0666)
+    if err!= nil{
+        fmt.Println("err:",err)
+    }
+}
+```
+
+
+
+**写字符串/字节串**
+
+```go
+func writeBytesOrStr(file *os.File){
+    s := "怒发冲冠，凭栏处、潇潇雨歇。"
+    file.Write([]byte(s))
+    //file.WriteString(s)
+}
+```
+
+
+
+**写文件**
+
+```go
+func writeFile(){
+    data,_ := os.ReadFile("满江红2.txt")	//从文件读出数据
+    os.WriteFile("满江红3",data,0666)		//将数据写入文件
+}
+```
+
+
+
+
+
+## 序列化
+
+**序列化：**通过某种方式把数据结构或对象写入到磁盘文件中或通过网络传到其他节点的过程。
+
+**反序列化：**把磁盘中对象或者把网络节点中传输的数据恢复为数据对象的过程。
+
+
+
+| go语言数据类型 | JSON支持的数据类型 |
+| -------------- | ------------------ |
+| 整型，浮点型   | 整型，浮点型       |
+| 字符串         | 字符串             |
+| 逻辑值         | 逻辑值             |
+| 数组，切片     | 数组(方括号)       |
+| map            | 对象(花括号)       |
+| nil            | null               |
+
+
+
+**JSON序列化：**
+
+`json.Marshal`：将`go的数据类型`序列化成`字节数组`
+
+```go
+var stu01 = map[string]string{"name": "张三", "age": "23", "gender": "male"}
+var stu02 = map[string]string{"name": "李四", "age": "30", "gender": "female"}
+var stu03 = map[string]string{"name": "王五", "age": "28", "gender": "male"}
+
+var stus = []map[string]string{stu01, stu02, stu03}	//将三个map对象放入到切片中
+
+ret,_ := json.Marshal(stus)			//json序列化
+fmt.Println(string(ret))
+os.WriteFile("stus.json",ret,0666)	//写入到磁盘
+```
+
+**JSON反序列化：**
+
+`json.Unmarshal`：将`字节数组`反序列化成`go的数据类型`
+
+```go
+ret,_ := os.ReadFile("stus.json")
+var data []map[string]string
+json.Unmarshal(ret,&data)	//把从文件中读取的ret反序列化成切片然后存入到data中
+```
 
 
 
@@ -603,40 +803,142 @@ func calc(x,y int)(sum,sub int){
 
 
 
+# 面向对象
+
+
+
+## struct定义
+
+结构体属于值类型
+
+
+
+`type`关键字
+
+```go
+//声明一种新的数据类型 myint，是int的一个别名
+type myint int
+```
+
+
+
+`struct`关键字
+
+**定义一个结构体**
+
+```go
+type Book struct{
+    title string
+    author string
+}
+```
+
+**实例化结构体-方法1**
+
+```go
+func main(){
+    var book1 Book
+    book1.title = "Golang"
+    book1.author = "zjs"
+}
+```
+
+**实例化结构体-方法2**
+
+```go
+func main(){
+    var book2 = new(Book)
+    book2.title = "Golang"
+    book2.author = "zjs"
+}
+```
+
+**实例化结构体-方法3**
+
+```go
+var book3 = &Book{}
+book3.title = "Golang"
+book3.author = "zjs"
+```
+
+**实例化结构体-方法4**
+
+```go
+var book4 = Book{
+    title:"Golang",
+    author:"zjs"
+}
+```
+
+
+
+
+
+## struct方法
+
+**给结构体定义方法**
+
+```go
+func (接收者变量 接收者类型) 方法名(参数列表)(返回值类型){
+    
+}
+```
+
+
+
+```go
+type Person struct{
+    Name string
+    Age int
+    Height int
+}
+
+func (p Person) PrintInfo(){
+    fmt.Printf("姓名: %\v 年龄:%v\n",p.Name,p.Age)
+}
+
+//修改的时候必须使用结构体指针去修改结构体里的属性
+func (p *Person) SetInfo(name string, age int){
+    p.Name = name
+    p.Age = age
+}
+```
+
+
+
+**重点：**
+
+- 如果方法对结构体进行写操作，接收者类型必须使用`指针`去访问
+
+- 如果类的属性首字母大写，表示该属性是对外能够访问的，否则只能在结构体内部使用
 
 
 
 
 
 
+## struct继承(嵌套)
 
+```go
+type Animal struct{
+    Name string
+    
+}
 
+type Dog struct{
+    Age string
+    Animal	//结构体嵌套，继承
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+func main(){
+    var d = Dog{
+        Age:20,
+        Animal:Animal{
+            Name:"阿奇"
+        }
+    }
+}
+```
 
 
 
