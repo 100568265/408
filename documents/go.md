@@ -52,11 +52,25 @@ go run hello.go
 
 
 
-## GoLand配置
+## 第三方包
 
 **GOROOT**位置：`/usr/local/go`
 
- 
+
+
+ **go mod：**`go mod`命令生成一个go.mod文件管理项目的依赖。
+
+**1.初始化项目**
+
+```shell
+go mod init 项目名
+```
+
+**2.下载包**
+
+在代码里`import`需要的第三方包，然后执行`go mod tidy`自动下载缺失的包
+
+
 
 
 
@@ -939,6 +953,235 @@ func main(){
     }
 }
 ```
+
+
+
+
+
+
+
+## 接口
+
+```go
+type Usber interface{
+    start()
+    stop()
+}
+
+//如果接口里有方法，必须通过结构体实现这个接口
+type Phone struct{
+    Name string
+}
+
+func(p Phone) start(){
+    //启动
+}
+
+func(p Phone) stop(){
+    //关机
+}
+
+func main(){
+    p := Phone{
+        Name:"myphone"
+    }
+    p.start()
+}
+```
+
+
+
+
+
+### **空接口**
+
+表示没有任何约束，任意的类型都可以实现空接口。
+
+
+
+空接口可以作为**函数的参数**，表示可以接收任意类型。
+
+```go
+func show(a interface{}){
+    fmt.Printf("值:%v 类型:%T\n",a,a)
+}
+```
+
+
+
+空接口可以作为**map的类型**
+
+```go
+var m1 = make(map[string]interface{})	//value为空接口类型
+m1["username"] = "张三"
+m1["age"] = 20
+m1["married"] = true
+```
+
+
+
+
+
+空接口可以作为**切片的类型**
+
+```go
+var s1 = []interface{}{1,2,"你好",true}
+```
+
+
+
+
+
+### **类型断言**
+
+**语法：**`v.(T)`
+
+```go
+func main(){
+    var a interface{}
+    a = "你好golang"
+    v,ok := a.(string)
+    if ok{
+        fmt.Println("a是一个string类型,值为: ",a)
+    }else{
+        fmt.Println("断言失败,a不是string类型")
+    }
+}
+```
+
+
+
+
+
+**例：**定义一个方法，可以传入任意数据类型，根据不同类型实现不同的功能
+
+```go
+//x.(type)判断一个变量的类型，这个语句只能用在switch里面
+func MyPrint(x interface{}){
+    switch x.(type){
+    case int:
+        fmt.Println("int类型")
+    case string:
+        fmt.Println("string类型")
+    case bool:
+        fmt.Println("bool类型")
+    default:
+        fmt.Println("传入错误")
+    }
+}
+```
+
+
+
+
+
+# 协程
+
+关键词`go`来创建并运行协程
+
+函数`runtime.Goexit()`退出协程
+
+```go
+func newTask(){
+    i := 0
+    for{
+        i++
+        fmt.Printf("new Goroutine : i = %d\n",i)
+        time.Sleep(1*time.Second)
+    }
+}
+
+func main(){
+    //子线程
+    go newTask()
+    
+    //主线程
+    i := 0
+    for{
+        i++
+        fmt.Printf("main routine : i = %d\n",i)
+        time.Sleep(1*time.Second)
+    }
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
