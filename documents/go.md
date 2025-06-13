@@ -1077,6 +1077,10 @@ func MyPrint(x interface{}){
 
 # 协程
 
+
+
+## goroutine
+
 关键词`go`来创建并运行协程
 
 函数`runtime.Goexit()`退出协程
@@ -1109,6 +1113,129 @@ func main(){
 
 
 
+## channel
+
+channel是goroutine之间的通信机制
+
+
+
+**无缓冲channel**
+
+```go
+//定义一个channel
+func main() {
+	c := make(chan int)
+
+	go func() {
+		defer fmt.Println("goroutine结束")
+
+		fmt.Println("goroutine 正在运行...")
+		c <- 666 //将666发送给channel c
+	}()		//闭包匿名函数
+
+	num := <-c //从channel c 中接收数据，并赋值给num
+	fmt.Println("num = ", num)
+	fmt.Println("main goroutine结束...")
+}
+```
+
+
+
+
+
+**有缓冲的channel**
+
+**特点：**
+
+当channel已经满了，再向里面写数据，就会阻塞
+
+当channel是空，再从里面读数据，也会阻塞
+
+```go
+func main(){
+    c := make(chan int,3)	//带有缓冲的channel
+    fmt.Println("len(c) = ",len(c),", cap(c) = ",cap(c))
+    
+    go func(){
+        defer fmt.Println("子go程结束")
+        
+        for i:=0;i<3;i++{
+            c <- i
+            fmt.Println("子go程正在运行,发送的元素 = ",i," len(c) = ",len(c),", cap(c) = ",cap(c))
+        }
+    }()
+    
+    time.Sleep(2*time.Second)
+    
+    for i:=0;i<4;i++{
+        num := <-c	//从c中读取数据
+        fmt.Println("num = ",num)
+    }
+    
+    fmt.Println("main结束")
+}
+```
+
+
+
+**关闭channel**
+
+语法：`close(c)`
+
+```go
+func main() {
+	c := make(chan int)
+
+	go func() {
+		for i := 0; i < 5; i++ {
+			c <- i
+		}
+		close(c) //关闭一个channel
+	}()
+
+	for {
+		//先执行表达式，得到一个ok，再去if判断ok
+		if data, ok := <-c; ok {
+			fmt.Println(data)
+		} else {
+			break
+		}
+	}
+
+	fmt.Println("main Finished...")
+}
+```
+
+
+
+
+
+**channel与range**
+
+可以使用range来迭代不断操作channel
+
+```go
+for data := range c{
+    fmt.Println(data)
+}
+```
+
+
+
+**channel与select**
+
+单流程下一个go只能监控一个channel的状态，select可以完成监控多个channel的状态 
+
+```go
+select{
+case <- chan1:
+    // 如果chan1成功读到数据，则进行该case处理语句
+case <- chan2:
+	// 如果chan2成功读到数据，则进行该case处理语句
+default:
+    //如果上面都没有成功，则进入default处理流程
+}
+```
 
 
 
@@ -1116,6 +1243,25 @@ func main(){
 
 
 
+# Gin
+
+
+
+## 安装
+
+轻量级的http web框架。
+
+1.下载并安装 gin
+
+```go
+go get -u github.com/gin-gonic/gin
+```
+
+2.将gin引入到代码中
+
+```go
+import "github.com/gin-gonic/gin"
+```
 
 
 
@@ -1123,9 +1269,17 @@ func main(){
 
 
 
+## 响应数据
 
-
-
+```go
+r := gin.Default()
+r.GET("/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
+r.Run(":80")
+```
 
 
 
